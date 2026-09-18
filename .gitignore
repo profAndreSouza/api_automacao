@@ -1,0 +1,25 @@
+# Python & Virtualenv
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.venv/
+env/
+venv/
+ENV/
+
+# Docker volumes & logs (caso montados localmente)
+*.log
+
+# Mosquitto local data/log se montado na pasta
+mqtt/data/
+mqtt/log/
+
+# Node-RED dados locais se montados na pasta
+nodered/data/
+
+# IDEs & SO
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
