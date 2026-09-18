@@ -74,7 +74,7 @@ Você verá:
 
 Para subir e executar a aplicação em uma instância EC2 rodando **Amazon Linux**, siga o passo a passo abaixo:
 
-### 1. Instalação e Inicialização do Docker
+### 1. Instalação e Inicialização do Docker, Docker Compose e Buildx
 
 Execute os seguintes comandos no terminal da instância:
 
@@ -90,15 +90,26 @@ sudo systemctl start docker.service
 sudo usermod -aG docker $USER
 
 newgrp docker
-```
 
-> [!TIP]
-> Caso a sua versão do Amazon Linux não venha com o plugin `docker compose` integrado por padrão, você pode instalar o Docker Compose Plugin via comando:
-> ```bash
-> sudo mkdir -p /usr/local/lib/docker/cli-plugins/
-> sudo curl -SL https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64 -o /usr/local/lib/docker/cli-plugins/docker-compose
-> sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
-> ```
+# Instalação do Docker Compose Plugin
+sudo mkdir -p /usr/local/lib/docker/cli-plugins
+
+sudo curl -SL https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64 \
+  -o /usr/local/lib/docker/cli-plugins/docker-compose
+
+sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
+
+# Instalação do Docker Buildx Plugin
+sudo rm -f /usr/local/lib/docker/cli-plugins/docker-buildx
+
+sudo curl -fL \
+  https://github.com/docker/buildx/releases/download/v0.17.1/buildx-v0.17.1.linux-amd64 \
+  -o /usr/local/lib/docker/cli-plugins/docker-buildx
+
+sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-buildx
+
+docker buildx version
+```
 
 ### 2. Configuração do Security Group na EC2
 
