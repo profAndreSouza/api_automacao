@@ -107,11 +107,21 @@ Certifique-se de que o **Security Group** associado à sua instância EC2 possui
 - **Porta 443 (TCP / Custom HTTP):** Acesso ao **Node-RED**
 - *(Opcional)* **Porta 1883 (TCP)** e **9001 (WS):** Caso queira conectar clientes MQTT externos diretamente ao Mosquitto.
 
-### 3. Subir a Aplicação na EC2
+### 3. Clonar o Repositório e Subir os Contêineres
 
-Dentro da pasta do projeto na EC2:
+Instale o Git (caso necessário), clone este repositório e suba a stack com o Docker Compose:
 
 ```bash
+# 1. Instalar git (se necessário)
+sudo yum install git -y
+
+# 2. Clonar o repositório
+git clone https://github.com/profAndreSouza/api_automacao.git
+
+# 3. Acessar o diretório do projeto
+cd api_automacao
+
+# 4. Construir e iniciar os contêineres em segundo plano
 docker compose up --build -d
 ```
 
@@ -132,20 +142,20 @@ Com a aplicação rodando, acesse via navegador utilizando o **IPv4 Público** o
 ## Acessos e Roteiro de Aula
 
 ### 1. Acessar a Fábrica Virtual (Simulador SCADA / API)
- Abra no navegador: **[http://localhost](http://localhost)** (ou [http://localhost:80](http://localhost:80))
+ Abra no navegador: **[http://localhost](http://localhost)** (ou **`http://<IP_PUBLICO_EC2>`** na AWS)
 - Acompanhe a telemetria em tempo real (Temperatura, Vibração, Pressão, Corrente).
 - Observe as contagens de produção e taxa de qualidade.
 - Use os botões de ação rápida para simular falhas e eventos (Superaquecimento, Vibração Excessiva, Parada de Emergência E-STOP, etc.).
 
 ### 2. Acessar o Node-RED e Importar o Fluxo
- Abra no navegador: **[http://localhost:443](http://localhost:443)**
+ Abra no navegador: **[http://localhost:443](http://localhost:443)** (ou **`http://<IP_PUBLICO_EC2>:443`** na AWS)
 1. Pressione `Ctrl + I` (ou Menu hambúrguer `☰` > **Import**).
-2. Copie o conteúdo do arquivo [`flows_semana05.json`](file:///c:/projetos/Material/Automação%20Industrial/materiais/semana_05/nodered/flows_semana05.json) e cole na caixa de texto.
+2. Copie o conteúdo do arquivo [`nodered/flows_semana05.json`](nodered/flows_semana05.json) e cole na caixa de texto.
 3. Clique em **Import** e em seguida no botão vermelho **Deploy** (canto superior direito).
 4. Abra o **Painel lateral Debug** (ícone do inseto `🪲` ou atalho `Ctrl + G` seguido de `D`).
 
 ### 3. Observação dos Eventos e Depuração
-- Com a aba Debug aberta no Node-RED, volte à tela da API/Simulador ([http://localhost](http://localhost)) e dispare os eventos.
+- Com a aba Debug aberta no Node-RED, volte à tela da API/Simulador ([http://localhost](http://localhost) ou na AWS) e dispare os eventos.
 - Observe a classificação de criticidade e os tratamentos nos nós:
   -  `[DEBUG] Telemetria Formatada`
   -  `[DEBUG] Alarme Crítico / Emergência`
@@ -154,7 +164,7 @@ Com a aplicação rodando, acesse via navegador utilizando o **IPv4 Público** o
 
 ---
 
-##  Como Parar os Contêineres
+## Como Parar os Contêineres
 
 Para encerrar a execução dos serviços:
 ```bash
@@ -163,38 +173,24 @@ docker compose down
 
 ---
 
-##  Subir em um Repositório Git Novo
+## Clonar o Repositório
 
-Caso deseje disponibilizar esta pasta como um repositório Git independente:
+Para clonar e executar o projeto em outro ambiente:
 
 ```bash
-# 1. Acesse a pasta semana_05
-cd materiais/semana_05
-
-# 2. Inicialize o repositório git local
-git init -b main
-
-# 3. Adicione todos os arquivos
-git add .
-
-# 4. Crie o primeiro commit
-git commit -m "feat: lab semana 05 - Node-RED (443), API (80), MQTT (1883)"
-
-# 5. Adicione a URL do seu novo repositório remoto (GitHub/GitLab)
-git remote add origin https://github.com/SEU_USUARIO/SEU_NOVO_REPOSITORIO.git
-
-# 6. Envie para o repositório
-git push -u origin main
+git clone https://github.com/profAndreSouza/api_automacao.git
+cd api_automacao
+docker compose up --build -d
 ```
 
 ---
 
-##  Estrutura de Diretórios da Semana 05
+## Estrutura de Diretórios
 
-A estrutura foi modularizada para manter cada componente isolado em seu próprio diretório:
+A estrutura do projeto está organizada da seguinte forma:
 
 ```
-materiais/semana_05/
+api_automacao/
 ├── docker-compose.yml          # Orquestração dos 3 contêineres Docker
 ├── README.md                   # Guia rápido de execução do laboratório
 │
