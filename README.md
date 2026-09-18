@@ -1,4 +1,4 @@
-# Semana 05: Orquestração de Dados e Fluxos IIoT com Node-RED
+# Orquestração de Dados e Fluxos IIoT com Node-RED
 
 Bem-vindo ao laboratório prático da **Semana 05** da disciplina de **Automação Industrial**!
 
@@ -50,7 +50,7 @@ Nesta aula prática, toda a infraestrutura roda **100% conteinerizada via Docker
 
 ---
 
-## Como Executar
+## Como Executar Localmente
 
 Abra o terminal na pasta do projeto e execute:
 
@@ -67,6 +67,65 @@ Você verá:
 - `mosquitto_broker` (Up - portas 1883, 9001)
 - `nodered_app` (Up - porta 443 -> 1880)
 - `flask_simulator_app` (Up - porta 80 -> 5000)
+
+---
+
+## Deploy na AWS EC2 (Amazon Linux)
+
+Para subir e executar a aplicação em uma instância EC2 rodando **Amazon Linux**, siga o passo a passo abaixo:
+
+### 1. Instalação e Inicialização do Docker
+
+Execute os seguintes comandos no terminal da instância:
+
+```bash
+sudo yum update
+
+sudo yum install docker
+
+sudo systemctl enable docker.service
+
+sudo systemctl start docker.service
+
+sudo usermod -aG docker $USER
+
+newgrp docker
+```
+
+> [!TIP]
+> Caso a sua versão do Amazon Linux não venha com o plugin `docker compose` integrado por padrão, você pode instalar o Docker Compose Plugin via comando:
+> ```bash
+> sudo mkdir -p /usr/local/lib/docker/cli-plugins/
+> sudo curl -SL https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64 -o /usr/local/lib/docker/cli-plugins/docker-compose
+> sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
+> ```
+
+### 2. Configuração do Security Group na EC2
+
+Certifique-se de que o **Security Group** associado à sua instância EC2 possui as seguintes regras de entrada (Inbound Rules) liberadas:
+- **Porta 80 (TCP / HTTP):** Acesso à **API / Simulador Web**
+- **Porta 443 (TCP / Custom HTTP):** Acesso ao **Node-RED**
+- *(Opcional)* **Porta 1883 (TCP)** e **9001 (WS):** Caso queira conectar clientes MQTT externos diretamente ao Mosquitto.
+
+### 3. Subir a Aplicação na EC2
+
+Dentro da pasta do projeto na EC2:
+
+```bash
+docker compose up --build -d
+```
+
+### 4. Portas e URLs de Acesso na AWS
+
+Com a aplicação rodando, acesse via navegador utilizando o **IPv4 Público** ou **DNS Público** da sua instância EC2:
+
+- **API / Simulador Web (Porta 80):**
+  - URL: `http://<IP_PUBLICO_EC2>` (ou `http://<IP_PUBLICO_EC2>:80`)
+- **Node-RED (Porta 443):**
+  - URL: `http://<IP_PUBLICO_EC2>:443`
+
+> [!NOTE]
+> Como o Node-RED está exposto na porta `443` utilizando HTTP simples (sem certificado SSL/TLS), utilize obrigatoriamente o prefixo `http://` no navegador: `http://<IP_PUBLICO_EC2>:443`. Se digitar `https://`, o navegador não conseguirá estabelecer a conexão.
 
 ---
 
