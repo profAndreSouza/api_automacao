@@ -194,47 +194,57 @@ Uma vez conectado no terminal do Amazon Linux, execute os blocos de comandos aba
 #### A) Instalação e Inicialização do Docker
 
 ```bash
+# Atualizar os pacotes do sistema operacional
 sudo yum update -y
 
+# Instalar o motor do Docker
 sudo yum install docker -y
 
+# Habilitar o serviço do Docker para inicialização automática no boot
 sudo systemctl enable docker.service
 
+# Iniciar o serviço do Docker
 sudo systemctl start docker.service
 
+# Adicionar o usuário atual ao grupo docker (permite executar comandos sem sudo)
 sudo usermod -aG docker $USER
 
+# Aplicar imediatamente as permissões de grupo na sessão atual
 newgrp docker
 ```
 
 #### B) Instalação do Docker Compose Plugin
 
 ```bash
-# Criar diretório de plugins do Docker
+# Criar diretório para plugins de CLI do Docker
 sudo mkdir -p /usr/local/lib/docker/cli-plugins
 
-# Baixar o binário do Docker Compose v2
+# Baixar o binário oficial do Docker Compose v2
 sudo curl -SL https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64 \
   -o /usr/local/lib/docker/cli-plugins/docker-compose
 
-# Dar permissão de execução ao binário
+# Conceder permissão de execução ao binário
 sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
+
+# Validar a versão instalada do Docker Compose
+docker compose version
 ```
 
 #### C) Instalação do Docker Buildx Plugin
 
 ```bash
-# Remover versões antigas se existirem
+# Remover versões anteriores do plugin (se existirem)
 sudo rm -f /usr/local/lib/docker/cli-plugins/docker-buildx
 
-# Baixar o plugin Docker Buildx
+# Baixar o binário oficial do plugin Docker Buildx
 sudo curl -fL \
   https://github.com/docker/buildx/releases/download/v0.17.1/buildx-v0.17.1.linux-amd64 \
   -o /usr/local/lib/docker/cli-plugins/docker-buildx
 
-# Dar permissão de execução e validar
+# Conceder permissão de execução ao binário
 sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-buildx
 
+# Validar a versão instalada do Docker Buildx
 docker buildx version
 ```
 

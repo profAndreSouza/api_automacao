@@ -77,63 +77,78 @@ Para subir e executar a aplicação em uma instância EC2 rodando **Amazon Linux
 > [!TIP]
 > Para o passo a passo detalhado com capturas de tela de todas as etapas de provisionamento no console da AWS, consulte o guia [ec2/ec2.md](ec2/ec2.md).
 
-### 1. Instalação e Inicialização do Docker, Docker Compose e Buildx
+### 1. Configuração do Security Group na EC2
 
-Execute os comandos abaixo no terminal da instância, separados por etapa:
+Durante o assistente de criação da EC2 (ou editando o **Security Group** posteriormente no console da AWS), certifique-se de liberar as seguintes portas nas regras de entrada (*Inbound Rules*):
+
+- **Porta 22 (TCP / SSH):** Acesso administrativo ao terminal da instância via SSH.
+- **Porta 80 (TCP / HTTP):** Acesso à interface web da **API / Simulador SCADA**.
+- **Porta 443 (TCP / Custom HTTP):** Acesso à interface visual de fluxos do **Node-RED**.
+- **Porta 1883 (TCP):** Comunicação de telemetria de sensores e atuadores com o broker **Eclipse Mosquitto (MQTT)**.
+- *(Opcional)* **Porta 9001 (TCP / WS):** Conexões MQTT via WebSocket.
+
+---
+
+### 2. Instalação e Inicialização do Docker, Docker Compose e Buildx
+
+Após se conectar à instância via SSH, execute os comandos abaixo no terminal, divididos por etapa:
 
 #### A) Instalação e Inicialização do Docker
 
 ```bash
+# Atualizar os pacotes do sistema operacional
 sudo yum update -y
 
+# Instalar o motor do Docker
 sudo yum install docker -y
 
+# Habilitar o serviço do Docker para inicialização automática no boot
 sudo systemctl enable docker.service
 
+# Iniciar o serviço do Docker
 sudo systemctl start docker.service
 
+# Adicionar o usuário atual ao grupo docker (permite executar comandos sem sudo)
 sudo usermod -aG docker $USER
 
+# Aplicar imediatamente as permissões de grupo na sessão atual
 newgrp docker
 ```
 
 #### B) Instalação do Docker Compose Plugin
 
 ```bash
-# Criar diretório de plugins do Docker
+# Criar diretório para plugins de CLI do Docker
 sudo mkdir -p /usr/local/lib/docker/cli-plugins
 
-# Baixar o binário do Docker Compose v2
+# Baixar o binário oficial do Docker Compose v2
 sudo curl -SL https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64 \
   -o /usr/local/lib/docker/cli-plugins/docker-compose
 
-# Dar permissão de execução ao binário
+# Conceder permissão de execução ao binário
 sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
+
+# Validar a versão instalada do Docker Compose
+docker compose version
 ```
 
 #### C) Instalação do Docker Buildx Plugin
 
 ```bash
-# Remover versões antigas se existirem
+# Remover versões anteriores do plugin (se existirem)
 sudo rm -f /usr/local/lib/docker/cli-plugins/docker-buildx
 
-# Baixar o plugin Docker Buildx
+# Baixar o binário oficial do plugin Docker Buildx
 sudo curl -fL \
   https://github.com/docker/buildx/releases/download/v0.17.1/buildx-v0.17.1.linux-amd64 \
   -o /usr/local/lib/docker/cli-plugins/docker-buildx
 
-# Dar permissão de execução e validar
+# Conceder permissão de execução ao binário
 sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-buildx
 
+# Validar a versão instalada do Docker Buildx
 docker buildx version
 ```
-
-### 2. Configuração do Security Group na EC2
-
-Certifique-se de que o **Security Group** associado à sua instância EC2 possui as seguintes regras de entrada (Inbound Rules) liberadas:
-- **Porta 80 (TCP / HTTP):** Acesso à **API / Simulador Web**
-- **Porta 443 (TCP / Custom HTTP):** Acesso ao **Node-RED**
-- *(Opcional)* **Porta 1883 (TCP)** e **9001 (WS):** Caso queira conectar clientes MQTT externos diretamente ao Mosquitto.
 
 ### 3. Clonar o Repositório e Subir os Contêineres
 
