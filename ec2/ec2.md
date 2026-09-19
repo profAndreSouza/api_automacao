@@ -187,38 +187,65 @@ ssh -i "IoT.pem" ec2-user@<IP_PUBLICO_DA_SUA_EC2>
 
 *(Substitua `<IP_PUBLICO_DA_SUA_EC2>` pelo IP real da sua máquina)*
 
-### 3. Instalar Docker e Docker Compose na EC2
+### 3. Instalar Docker, Docker Compose e Buildx na EC2
 
-Uma vez conectado no terminal do Amazon Linux 2023, execute a sequência de comandos:
+Uma vez conectado no terminal do Amazon Linux, execute os blocos de comandos abaixo:
+
+#### A) Instalação e Inicialização do Docker
 
 ```bash
-# 1. Atualizar os pacotes do sistema
-sudo dnf update -y
+sudo yum update -y
 
-# 2. Instalar o motor do Docker e o Git
-sudo dnf install -y docker git
+sudo yum install docker -y
 
-# 3. Inicializar e habilitar o serviço do Docker na inicialização
-sudo systemctl start docker
-sudo systemctl enable docker
+sudo systemctl enable docker.service
 
-# 4. Adicionar o usuário ec2-user ao grupo do Docker (para executar sem 'sudo')
-sudo usermod -aG docker ec2-user
+sudo systemctl start docker.service
 
-# 5. Instalar o plugin Docker Compose v2
-sudo mkdir -p /usr/local/lib/docker/cli-plugins
-sudo curl -SL https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64 -o /usr/local/lib/docker/cli-plugins/docker-compose
-sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
+sudo usermod -aG docker $USER
 
-# 6. Recarregar a sessão para aplicar as permissões de grupo
 newgrp docker
+```
+
+#### B) Instalação do Docker Compose Plugin
+
+```bash
+# Criar diretório de plugins do Docker
+sudo mkdir -p /usr/local/lib/docker/cli-plugins
+
+# Baixar o binário do Docker Compose v2
+sudo curl -SL https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64 \
+  -o /usr/local/lib/docker/cli-plugins/docker-compose
+
+# Dar permissão de execução ao binário
+sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
+```
+
+#### C) Instalação do Docker Buildx Plugin
+
+```bash
+# Remover versões antigas se existirem
+sudo rm -f /usr/local/lib/docker/cli-plugins/docker-buildx
+
+# Baixar o plugin Docker Buildx
+sudo curl -fL \
+  https://github.com/docker/buildx/releases/download/v0.17.1/buildx-v0.17.1.linux-amd64 \
+  -o /usr/local/lib/docker/cli-plugins/docker-buildx
+
+# Dar permissão de execução e validar
+sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-buildx
+
+docker buildx version
 ```
 
 ### 4. Clonar e Subir a Aplicação
 
 ```bash
-# Clonar o repositório da disciplina
-git clone https://github.com/<seu-usuario>/api_automacao.git
+# 1. Instalar git (se necessário)
+sudo yum install git -y
+
+# 2. Clonar o repositório da disciplina
+git clone https://github.com/profAndreSouza/api_automacao.git
 cd api_automacao
 
 # Subir os 3 contêineres em segundo plano

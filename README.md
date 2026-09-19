@@ -74,14 +74,19 @@ Você verá:
 
 Para subir e executar a aplicação em uma instância EC2 rodando **Amazon Linux**, siga o passo a passo abaixo:
 
+> [!TIP]
+> Para o passo a passo detalhado com capturas de tela de todas as etapas de provisionamento no console da AWS, consulte o guia [ec2/ec2.md](ec2/ec2.md).
+
 ### 1. Instalação e Inicialização do Docker, Docker Compose e Buildx
 
-Execute os seguintes comandos no terminal da instância:
+Execute os comandos abaixo no terminal da instância, separados por etapa:
+
+#### A) Instalação e Inicialização do Docker
 
 ```bash
-sudo yum update
+sudo yum update -y
 
-sudo yum install docker
+sudo yum install docker -y
 
 sudo systemctl enable docker.service
 
@@ -90,22 +95,34 @@ sudo systemctl start docker.service
 sudo usermod -aG docker $USER
 
 newgrp docker
+```
 
-# Instalação do Docker Compose Plugin
+#### B) Instalação do Docker Compose Plugin
+
+```bash
+# Criar diretório de plugins do Docker
 sudo mkdir -p /usr/local/lib/docker/cli-plugins
 
+# Baixar o binário do Docker Compose v2
 sudo curl -SL https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64 \
   -o /usr/local/lib/docker/cli-plugins/docker-compose
 
+# Dar permissão de execução ao binário
 sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
+```
 
-# Instalação do Docker Buildx Plugin
+#### C) Instalação do Docker Buildx Plugin
+
+```bash
+# Remover versões antigas se existirem
 sudo rm -f /usr/local/lib/docker/cli-plugins/docker-buildx
 
+# Baixar o plugin Docker Buildx
 sudo curl -fL \
   https://github.com/docker/buildx/releases/download/v0.17.1/buildx-v0.17.1.linux-amd64 \
   -o /usr/local/lib/docker/cli-plugins/docker-buildx
 
+# Dar permissão de execução e validar
 sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-buildx
 
 docker buildx version
