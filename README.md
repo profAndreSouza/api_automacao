@@ -205,6 +205,10 @@ api_automacao/
 ├── docker-compose.yml          # Orquestração dos 3 contêineres Docker
 ├── README.md                   # Guia rápido de execução do laboratório
 │
+├── ec2/                        # Guia e evidências de implantação na AWS EC2
+│   ├── ec2.md                  # Passo a passo detalhado de criação e setup da EC2
+│   └── ec2_*.jpg               # Capturas de tela do console de provisionamento AWS
+│
 ├── api/                        # Aplicação Web / Simulador SCADA Flask
 │   ├── Dockerfile              # Build da imagem da aplicação Python
 │   ├── app.py                  # Servidor Flask e simulador de chão de fábrica
